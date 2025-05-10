@@ -1,0 +1,49 @@
+<div class="chatbot-container">
+  <div class="messages">
+    <div *ngFor="let msg of messages" class="message-row" [ngClass]="msg.sender">
+      <div class="bubble">
+        <ng-container *ngIf="msg.sender === 'bot'; else userText">
+          <markdown [data]="msg.text"></markdown>
+          <ng-container *ngIf="msg.responseDetails">
+            <button class="details-btn" (click)="toggleDetails(msg)">{{ msg.showDetails ? 'Hide Details' : 'Show Details' }}</button>
+            <div *ngIf="msg.showDetails" class="details-panel">
+              <app-response-details [response]="msg.responseDetails"></app-response-details>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #userText>
+          <span>{{ msg.text }}</span>
+        </ng-template>
+      </div>
+    </div>
+    <div *ngIf="loading" class="loading">Bot is typing...</div>
+  </div>
+  <div class="tool-choice-panel" style="margin: 1rem 0; padding: 1rem; background: #f8f6fd; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Tool Choice</label>
+    <div style="display: flex; flex-wrap: wrap; gap: 1.5em; align-items: center;">
+      <label><input type="radio" name="toolChoice" [(ngModel)]="toolChoice" value="auto" /> Auto <span style="font-size: 0.92em; color: #888;">(Let model decide)</span></label>
+      <label><input type="radio" name="toolChoice" [(ngModel)]="toolChoice" value="required" /> Required <span style="font-size: 0.92em; color: #888;">(Must call ≥1 tool)</span></label>
+      <label><input type="radio" name="toolChoice" [(ngModel)]="toolChoice" value="none" /> None <span style="font-size: 0.92em; color: #888;">(No tools)</span></label>
+      <label style="display: flex; align-items: center; gap: 0.5em;">
+        <input type="radio" name="toolChoice" [(ngModel)]="toolChoice" value="function" />
+        Forced Function
+        <select [(ngModel)]="forcedFunctionName" name="forcedFunctionName" [disabled]="toolChoice !== 'function'" style="margin-left: 0.5em; min-width: 120px;">
+          <option value="" disabled>Select function...</option>
+          <option *ngFor="let fn of availableFunctions" [value]="fn">{{ fn }}</option>
+        </select>
+      </label>
+    </div>
+    <div style="font-size: 0.95em; color: #666; margin-top: 0.5em;">
+      <span *ngIf="toolChoice === 'auto'">The model will decide when and how many tools to use.</span>
+      <span *ngIf="toolChoice === 'required'">The model will be required to call at least one tool.</span>
+      <span *ngIf="toolChoice === 'none'">No tools will be called (like passing no functions).</span>
+      <span *ngIf="toolChoice === 'function'">Exactly one specific function will be called.</span>
+    </div>
+  </div>
+
+  <form (submit)="sendMessage(); $event.preventDefault()" class="input-area">
+    <input [(ngModel)]="userInput" name="userInput" placeholder="Type your message..." autocomplete="off" />
+    <button type="submit" [disabled]="loading || !userInput.trim()">Send</button>
+  </form>
+
+</div>

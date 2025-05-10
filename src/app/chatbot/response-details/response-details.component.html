@@ -1,0 +1,35 @@
+<div class="response-details-container" *ngIf="response">
+  <div class="accordion-header" (click)="toggleDetails()" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+    <span style="font-weight: bold;">More Details</span>
+    <button type="button" style="margin-left: auto;" (click)="$event.stopPropagation(); toggleDetails();">
+      {{ expanded ? 'Hide Details' : 'Show Details' }}
+    </button>
+  </div>
+  <div *ngIf="expanded" class="accordion-details" style="margin-top: 1rem;">
+    <div *ngIf="response.names_of_tools_used && response.names_of_tools_used.length">
+      <div style="margin-bottom: 0.5rem;"><strong>Tools Used:</strong></div>
+      <ul style="margin-top: 0;">
+        <li *ngFor="let tool of response.names_of_tools_used">{{ tool }}</li>
+      </ul>
+    </div>
+    <div *ngIf="response.flow && response.flow.length">
+      <h5 style="display: flex; align-items: center; gap: 0.5em;">
+        <span>Flow</span>
+        <span *ngIf="response.flow.length" style="font-weight: normal; font-size: 0.95em; color: #666;">
+          ({{ flowTypeSummary }})
+        </span>
+        <button type="button" (click)="$event.stopPropagation(); flowExpanded = !flowExpanded" style="margin-left: auto; font-size: 0.95em;">
+          {{ flowExpanded ? 'Collapse' : 'Expand' }} Flow
+        </button>
+      </h5>
+      <ol class="flow-list" *ngIf="flowExpanded">
+        <li *ngFor="let step of response.flow">
+          <div><strong>Type:</strong> {{ step.type }}</div>
+          <div><strong>Details:</strong>
+            <ngx-json-viewer [json]="step.details" [expanded]="false"></ngx-json-viewer>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="tool-list-container">
+  <button (click)="refreshTools()" [disabled]="loading">Refresh Tools</button>
+  <div *ngIf="loading" class="loading">Loading tools...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="!loading && !error">
+    <div *ngIf="tools.length === 0">No tools available.</div>
+    <div *ngFor="let tool of tools" class="tool-item" style="border: 2px solid #b39ddb; border-left-width: 6px; border-radius: 8px; margin-bottom: 12px; padding: 8px 12px; background: #f8f6fd; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <ngx-json-viewer [json]="tool" [expanded]="false"></ngx-json-viewer>
+    </div>
+  </div>
+</div>
