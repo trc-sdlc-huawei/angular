@@ -6,8 +6,12 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
 interface Tool {
   name: string;
   description: string;
-  inputSchema: any;
-  annotations: any;
+  parameters: any;
+  [key: string]: any;
+}
+
+interface ServerToolsDict {
+  [server: string]: Tool[];
 }
 
 @Component({
@@ -18,30 +22,98 @@ interface Tool {
   styleUrl: './tool-list.component.scss'
 })
 export class ToolListComponent {
-  tools: Tool[] = [];
+  openaiTools: ServerToolsDict = {};
+  rawTools: ServerToolsDict = {};
+  rawToolsFull: { [server: string]: any } = {};
+  openaiServerNames: string[] = [];
+  rawServerNames: string[] = [];
+  expandedServers: { [key: string]: boolean } = {};
   loading = false;
   error: string | null = null;
+  // UI state for collapsible panels
+  showOpenAITools = false;
+  showRawTools = false;
 
   constructor(private http: HttpClient) {
-    this.getTools();
+    this.getAllTools();
   }
 
-  getTools() {
+  getAllTools() {
     this.loading = true;
     this.error = null;
-    this.http.get<Tool[]>('http://localhost:8000/tools').subscribe({
+    let openaiDone = false;
+    let rawDone = false;
+    this.http.get<ServerToolsDict>('http://localhost:8000/openai-tools').subscribe({
       next: (tools) => {
-        this.tools = tools;
-        this.loading = false;
+        this.openaiTools = tools;
+        this.openaiServerNames = Object.keys(tools);
+        this.openaiServerNames.forEach(server => this.expandedServers['openai-' + server] = false);
+        openaiDone = true;
+        if (rawDone) this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load tools.';
-        this.loading = false;
+        this.error = 'Failed to load OpenAI tools.';
+        openaiDone = true;
+        if (rawDone) this.loading = false;
+      }
+    });
+    this.http.get<any>('http://localhost:8000/raw-tools').subscribe({
+      next: (toolsRaw) => {
+        // Store the full server object for each server
+        this.rawToolsFull = toolsRaw;
+        // Normalize raw tools: { server: { tools: Tool[], ... } } => { server: Tool[] }
+        const normalized: ServerToolsDict = {};
+        Object.keys(toolsRaw).forEach(server => {
+          const entry = toolsRaw[server];
+          if (entry && Array.isArray(entry.tools)) {
+            normalized[server] = entry.tools;
+          } else {
+            normalized[server] = [];
+          }
+        });
+        this.rawTools = normalized;
+        this.rawServerNames = Object.keys(normalized);
+        this.rawServerNames.forEach(server => this.expandedServers['raw-' + server] = false);
+        rawDone = true;
+        if (openaiDone) this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load raw tools.';
+        rawDone = true;
+        if (openaiDone) this.loading = false;
       }
     });
   }
 
   refreshTools() {
-    this.getTools();
+    this.getAllTools();
+  }
+
+  toggleServer(prefix: string, server: string) {
+    this.expandedServers[prefix + '-' + server] = !this.expandedServers[prefix + '-' + server];
+  }
+
+  toggleOpenAITools() {
+    this.showOpenAITools = !this.showOpenAITools;
+  }
+
+  toggleRawTools() {
+    this.showRawTools = !this.showRawTools;
+  }
+
+  get totalOpenAIServers(): number {
+    return this.openaiServerNames.length;
+  }
+
+  get totalRawServers(): number {
+    return this.rawServerNames.length;
+  }
+
+  get totalOpenAITools(): number {
+    return this.openaiServerNames.reduce((sum, server) => sum + (this.openaiTools[server]?.length || 0), 0);
+  }
+
+  get totalRawTools(): number {
+    return this.rawServerNames.reduce((sum, server) => sum + (this.rawTools[server]?.length || 0), 0);
   }
 }

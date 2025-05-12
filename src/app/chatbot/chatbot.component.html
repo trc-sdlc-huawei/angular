@@ -1,4 +1,9 @@
 <div class="chatbot-container">
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+    <button (click)="newConversation()" style="background: #5e35b1; color: #fff; border: none; border-radius: 6px; padding: 0.5em 1.2em; font-weight: 600; font-size: 1em; box-shadow: 0 2px 8px rgba(94,53,177,0.08); cursor: pointer; transition: background 0.2s;">
+      &#x1F504; New Conversation
+    </button>
+  </div>
   <div class="messages">
     <div *ngFor="let msg of messages" class="message-row" [ngClass]="msg.sender">
       <div class="bubble">
@@ -18,7 +23,10 @@
     </div>
     <div *ngIf="loading" class="loading">Bot is typing...</div>
   </div>
-  <div class="tool-choice-panel" style="margin: 1rem 0; padding: 1rem; background: #f8f6fd; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+  <button (click)="toggleToolChoicePanel()" style="margin: 1rem 0 0.3rem 0; padding: 0.4em 1.2em; font-size: 1em; border-radius: 6px; background: #ede7f6; color: #4527a0; font-weight: 600; border: none; cursor: pointer;">
+    {{ showToolChoicePanel ? 'Hide Tool Choice Options' : 'Show Tool Choice Options' }}
+  </button>
+  <div *ngIf="showToolChoicePanel" class="tool-choice-panel" style="margin: 0.3rem 0 1rem 0; padding: 1rem; background: #f8f6fd; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
     <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Tool Choice</label>
     <div style="display: flex; flex-wrap: wrap; gap: 1.5em; align-items: center;">
       <label><input type="radio" name="toolChoice" [(ngModel)]="toolChoice" value="auto" /> Auto <span style="font-size: 0.92em; color: #888;">(Let model decide)</span></label>
@@ -33,11 +41,21 @@
         </select>
       </label>
     </div>
+
     <div style="font-size: 0.95em; color: #666; margin-top: 0.5em;">
       <span *ngIf="toolChoice === 'auto'">The model will decide when and how many tools to use.</span>
       <span *ngIf="toolChoice === 'required'">The model will be required to call at least one tool.</span>
       <span *ngIf="toolChoice === 'none'">No tools will be called (like passing no functions).</span>
       <span *ngIf="toolChoice === 'function'">Exactly one specific function will be called.</span>
+    </div>
+    <div style="margin-top: 1em;">
+      <label style="display: flex; align-items: center; gap: 0.5em; font-size: 1em;">
+        <input type="checkbox" [(ngModel)]="parallelToolCalls" />
+        Enable Parallel Tool Calls
+      </label>
+      <div style="font-size: 0.93em; color: #888; margin-top: 0.2em; margin-left: 1.6em;">
+        The model may choose to call multiple functions in a single turn. You can prevent this by setting parallel_tool_calls to false, which ensures exactly zero or one tool is called.
+      </div>
     </div>
   </div>
 

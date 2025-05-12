@@ -3,9 +3,74 @@
   <div *ngIf="loading" class="loading">Loading tools...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
   <div *ngIf="!loading && !error">
-    <div *ngIf="tools.length === 0">No tools available.</div>
-    <div *ngFor="let tool of tools" class="tool-item" style="border: 2px solid #b39ddb; border-left-width: 6px; border-radius: 8px; margin-bottom: 12px; padding: 8px 12px; background: #f8f6fd; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
-      <ngx-json-viewer [json]="tool" [expanded]="false"></ngx-json-viewer>
+    <!-- OpenAI Tools Panel -->
+    <div class="tools-panel" style="margin-bottom: 14px; max-width: 420px;">
+      <div (click)="toggleOpenAITools()" style="cursor: pointer; display: flex; align-items: center; background: #effde3; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 4px rgba(33,150,243,0.04);">
+        <span style="font-size: 17px; font-weight: 600; color: #c0d219;">
+          <span [style.transform]="showOpenAITools ? 'rotate(90deg)' : 'rotate(0deg)'" style="display: inline-block; transition: transform 0.2s;">▶</span>
+          <span style="margin-left: 8px;">OpenAI Tools</span>
+        </span>
+        <span style="margin-left: auto; background: #bbfbce; color: #19d26c; border-radius: 12px; padding: 2px 10px; font-size: 13px;">{{ totalOpenAIServers }} servers, {{ totalOpenAITools }} tools</span>
+      </div>
+      <div *ngIf="showOpenAITools" style="padding: 8px 0 0 0;">
+        <div *ngIf="totalOpenAIServers === 0" style="color: #888; padding: 8px;">No servers available.</div>
+        <div *ngFor="let server of openaiServerNames" class="server-section" style="margin-bottom: 14px;">
+          <div class="server-header" (click)="toggleServer('openai', server)" style="cursor: pointer; display: flex; align-items: center; background: #ede7f6; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 15px; font-weight: 600; color: #5e35b1;">
+              <span [style.transform]="expandedServers['openai-' + server] ? 'rotate(90deg)' : 'rotate(0deg)'" style="display: inline-block; transition: transform 0.2s;">▶</span>
+              <span style="margin-left: 8px;">{{ server }}</span>
+            </span>
+            <span style="margin-left: auto; background: #d1c4e9; color: #4527a0; border-radius: 12px; padding: 2px 10px; font-size: 12px;">{{ openaiTools[server].length }} tools</span>
+          </div>
+          <div *ngIf="expandedServers['openai-' + server]" class="server-tools-list" style="margin-top: 8px;">
+            <div class="tool-names-list" style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+              <span *ngFor="let tool of openaiTools[server]" style="background: #ede7f6; color: #4527a0; border-radius: 12px; padding: 3px 10px; font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: default;">
+                {{ tool.name }} 
+              </span>
+            </div>
+            <div *ngFor="let tool of openaiTools[server]" class="tool-item" style="border: 2px solid #b39ddb; border-left-width: 5px; border-radius: 8px; margin-bottom: 8px; padding: 7px 10px; background: #f8f6fd; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+              <div style="font-size: 15px; font-weight: 500; color: #4527a0; margin-bottom: 2px;">{{ tool.name }}</div>
+              <div style="font-size: 13px; color: #333; margin-bottom: 6px;">{{ tool.description }}</div>
+              <ngx-json-viewer [json]="tool" [expanded]="false"></ngx-json-viewer>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+    <!-- Raw Tools Panel -->
+    <div class="tools-panel" style="margin-bottom: 14px; max-width: 420px;">
+      <div (click)="toggleRawTools()" style="cursor: pointer; display: flex; align-items: center; background: #fbe9e7; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 4px rgba(255,87,34,0.04);">
+        <span style="font-size: 17px; font-weight: 600; color: #d84315;">
+          <span [style.transform]="showRawTools ? 'rotate(90deg)' : 'rotate(0deg)'" style="display: inline-block; transition: transform 0.2s;">▶</span>
+          <span style="margin-left: 8px;">Raw Tools</span>
+        </span>
+        <span style="margin-left: auto; background: #ffccbc; color: #d84315; border-radius: 12px; padding: 2px 10px; font-size: 13px;">{{ totalRawServers }} servers, {{ totalRawTools }} tools</span>
+      </div>
+      <div *ngIf="showRawTools" style="padding: 8px 0 0 0;">
+        <div *ngIf="totalRawServers === 0" style="color: #888; padding: 8px;">No servers available.</div>
+        <div *ngFor="let server of rawServerNames" class="server-section" style="margin-bottom: 14px;">
+          <div class="server-header" (click)="toggleServer('raw', server)" style="cursor: pointer; display: flex; align-items: center; background: #ede7f6; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 15px; font-weight: 600; color: #5e35b1;">
+              <span [style.transform]="expandedServers['raw-' + server] ? 'rotate(90deg)' : 'rotate(0deg)'" style="display: inline-block; transition: transform 0.2s;">▶</span>
+              <span style="margin-left: 8px;">{{ server }}</span>
+            </span>
+            <span style="margin-left: auto; background: #d1c4e9; color: #4527a0; border-radius: 12px; padding: 2px 10px; font-size: 12px;">{{ rawTools[server].length }} tools</span>
+          </div>
+          <div *ngIf="expandedServers['raw-' + server]" class="server-tools-list" style="margin-top: 8px;">
+
+            <div class="tool-names-list" style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+              <span *ngFor="let tool of rawTools[server]" style="background: #ede7f6; color: #4527a0; border-radius: 12px; padding: 3px 10px; font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: default;">
+                {{ tool.name }}
+              </span>
+            </div>
+            <div *ngFor="let tool of rawTools[server]" class="tool-item" style="border: 2px solid #b39ddb; border-left-width: 5px; border-radius: 8px; margin-bottom: 8px; padding: 7px 10px; background: #f8f6fd; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+              <div style="font-size: 15px; font-weight: 500; color: #4527a0; margin-bottom: 2px;">{{ tool.name }}</div>
+              <div style="font-size: 13px; color: #333; margin-bottom: 6px;">{{ tool.description }}</div>
+              <ngx-json-viewer [json]="tool" [expanded]="false"></ngx-json-viewer>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

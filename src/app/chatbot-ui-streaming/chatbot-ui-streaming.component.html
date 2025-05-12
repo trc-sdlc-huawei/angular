@@ -1,0 +1,23 @@
+<button class="new-convo-btn" (click)="newConversation()" type="button">New Conversation</button>
+<div class="chat-container">
+  <div class="messages">
+    <div *ngFor="let msg of messages" [ngClass]="msg.role">
+      <span class="bubble" *ngIf="msg.role === 'user'">{{ msg.content }}</span>
+      <ng-container *ngIf="msg.role === 'assistant'">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+          <markdown class="bubble" [data]="msg.content"></markdown>
+          <ng-container *ngIf="msg.responseDetails">
+            <button class="details-btn" style="margin-top: 0.5em;" (click)="msg.showDetails = !msg.showDetails">{{ msg.showDetails ? 'Hide Details' : 'Show Details' }}</button>
+            <div *ngIf="msg.showDetails" class="details-panel">
+              <app-response-details [response]="msg.responseDetails"></app-response-details>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <form class="input-row" (ngSubmit)="sendMessage()" autocomplete="off">
+    <input type="text" [(ngModel)]="input" name="chatInput" placeholder="Type your message..." [disabled]="loading" autocomplete="off" />
+    <button type="submit" [disabled]="loading || !input.trim()">{{ loading ? '...' : 'Send' }}</button>
+  </form>
+</div>

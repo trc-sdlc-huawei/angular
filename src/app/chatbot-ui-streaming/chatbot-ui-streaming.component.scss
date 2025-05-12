@@ -1,0 +1,106 @@
+.new-convo-btn {
+  display: block;
+  margin: 0 auto 1.2em auto;
+  padding: 0.7em 2.1em;
+  background: #fff;
+  color: #4527a0;
+  border: 2px solid #4527a0;
+  border-radius: 0.9em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 5px rgba(69,39,160,0.04);
+}
+.new-convo-btn:hover, .new-convo-btn:focus {
+  background: #ede7f6;
+  color: #311b92;
+  border-color: #311b92;
+}
+.new-convo-btn:active {
+  background: #4527a0;
+  color: #fff;
+  border-color: #4527a0;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #faf8ff;
+  box-shadow: 0 2px 8px rgba(69,39,160,0.05);
+  padding: 2em 2em 1.5em 2em;
+}
+.messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+}
+.user {
+  display: flex;
+  justify-content: flex-end;
+}
+.assistant {
+  display: flex;
+  justify-content: flex-start;
+}
+.bubble {
+  display: inline-block;
+  padding: 0.7em 1.1em;
+  border-radius: 1.2em;
+  font-size: 1rem;
+  line-height: 1.4;
+  max-width: 80%;
+  word-break: break-word;
+  box-shadow: 0 1px 4px rgba(69,39,160,0.04);
+}
+.user .bubble {
+  background: #ede7f6;
+  color: #4527a0;
+  border-bottom-right-radius: 0.5em;
+}
+.assistant .bubble {
+  background: #f3f0fa;
+  color: #311b92;
+  border-bottom-left-radius: 0.5em;
+}
+.input-row {
+  display: flex;
+  gap: 0.6em;
+}
+.input-row input[type="text"] {
+  flex: 1 1 auto;
+  padding: 0.7em 1em;
+  border-radius: 0.7em;
+  border: 1px solid #c7bfe6;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  color: #311b92;
+  transition: border 0.2s;
+}
+.input-row input[type="text"]:focus {
+  border: 1.5px solid #4527a0;
+}
+.input-row button {
+  background: #4527a0;
+  color: #fff;
+  border: none;
+  border-radius: 0.7em;
+  padding: 0.7em 1.4em;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.input-row button:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}

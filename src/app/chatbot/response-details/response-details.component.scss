@@ -1,0 +1,61 @@
+.response-details-container {
+  background: #faf8ff;
+  border-radius: 10px;
+  border: 1px solid #e0e0f0;
+  box-shadow: 0 2px 8px rgba(69,39,160,0.06);
+  padding: 1.2em 1.2em 1em 1.2em;
+  margin-top: 1em;
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.97em;
+  color: #311b92;
+}
+
+.accordion-header {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #311b92;
+  margin-bottom: 0.7em;
+  display: flex;
+  align-items: center;
+}
+
+.flow-list {
+  padding-left: 1.5em;
+  margin-bottom: 0.7em;
+  margin-top: 0.3em;
+}
+.flow-list li {
+  margin-bottom: 0.8em;
+  background: #f4f2fb;
+  border-radius: 6px;
+  padding: 0.7em 0.9em;
+  box-shadow: 0 1px 3px rgba(69,39,160,0.03);
+}
+
+.details-panel {
+  margin-top: 0.8em;
+  background: #f7f6fc;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(69,39,160,0.05);
+  padding: 1em;
+  font-size: 0.98em;
+  max-height: 350px;
+  overflow: auto;
+}
+
+.ngx-json-viewer {
+  font-size: 0.97em;
+  background: transparent;
+}
+
+@media (max-width: 700px) {
+  .response-details-container {
+    padding: 0.7em 0.3em 0.7em 0.3em;
+    font-size: 0.93em;
+  }
+  .details-panel {
+    padding: 0.6em;
+    font-size: 0.93em;
+  }
+}

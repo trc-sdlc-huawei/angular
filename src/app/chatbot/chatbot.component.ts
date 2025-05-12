@@ -30,19 +30,37 @@ export class ChatbotComponent {
   forcedFunctionName: string = '';
   availableFunctions: string[] = [];
 
+  showToolChoicePanel = false;
+  parallelToolCalls: boolean = true;
+
   constructor(private http: HttpClient) {
     this.fetchAvailableFunctions();
   }
 
+  toggleToolChoicePanel() {
+    this.showToolChoicePanel = !this.showToolChoicePanel;
+  }
+
+  newConversation() {
+    this.messages = [];
+    this.userInput = '';
+    this.selectedResponse = null;
+    // Optionally reset tool choice UI state if you want:
+    // this.toolChoice = 'auto';
+    // this.forcedFunctionName = '';
+  }
+
   fetchAvailableFunctions() {
-    this.http.get<any[]>('http://localhost:8000/tools').subscribe({
-      next: (tools) => {
-        // Assume each tool has a 'name' property
-        this.availableFunctions = Array.isArray(tools) ? tools.map(t => t.name).filter(Boolean) : [];
-      },
-      error: () => {
-        this.availableFunctions = [];
-      }
+    // Fetch both openai-tools and raw-tools, then merge their names
+    Promise.all([
+      this.http.get<any[]>('http://localhost:8000/openai-tools').toPromise().catch(() => []),
+      this.http.get<any[]>('http://localhost:8000/raw-tools').toPromise().catch(() => [])
+    ]).then(([openaiTools, rawTools]) => {
+      const openaiNames = Array.isArray(openaiTools) ? openaiTools.map(t => t.name).filter(Boolean) : [];
+      const rawNames = Array.isArray(rawTools) ? rawTools.map(t => t.name).filter(Boolean) : [];
+      this.availableFunctions = [...new Set([...openaiNames, ...rawNames])];
+    }).catch(() => {
+      this.availableFunctions = [];
     });
   }
 
@@ -71,7 +89,12 @@ export class ChatbotComponent {
       tool_choice = 'auto';
     }
 
-    this.http.post<any>('http://localhost:8000/query', { llm_choice: 'openai', query: input, tool_choice }).subscribe({
+    this.http.post<any>('http://localhost:8000/query', {
+      llm_choice: 'openai',
+      query: input,
+      tool_choice,
+      parallel_tool_calls: this.parallelToolCalls
+    }).subscribe({
       next: (res) => {
         const response = res?.response;
         if (response?.final_answer) {

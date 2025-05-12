@@ -9,18 +9,58 @@
 
 
 
+<style>
+  nav[role="tablist"] a {
+    padding: 0.5em 1.2em;
+    border-radius: 6px;
+    background: #ede7f6;
+    color: #4527a0;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    position: relative;
+  }
+  nav[role="tablist"] a:hover,
+  nav[role="tablist"] a:focus {
+    background: #d1c4e9;
+    color: #311b92;
+    box-shadow: 0 2px 8px rgba(69,39,160,0.08);
+  }
+  nav[role="tablist"] a:active {
+    background: #7e57c2;
+    color: #fff;
+  }
+  nav[role="tablist"] a.active-nav, .active-nav {
+    background: #4527a0 !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 12px rgba(69,39,160,0.18);
+  }
+</style>
+
+
 <main class="main" style="display: flex; justify-content: center; align-items: flex-start; gap: 2rem; width: 100vw;">
-  <div style="flex: 1; max-width: 1000px; min-width: 500px;"><app-chatbot></app-chatbot></div>
-  <div style="flex: 1; max-width: 280px; min-width: 200px;"><app-tool-list></app-tool-list></div>
+  <div style="flex: 1; max-width: 1000px; min-width: 500px;">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div style="flex: 1; max-width: 320px; min-width: 220px;">
+    <div style="margin-bottom: 12px;">
+      <div (click)="showMetadataPanel = !showMetadataPanel" style="cursor:pointer; display:flex; align-items:center; background:#ede7f6; border-radius:8px; padding:8px 14px; font-size:17px; font-weight:600; color:#4527a0;">
+        <span [style.transform]="showMetadataPanel ? 'rotate(90deg)' : 'rotate(0deg)'" style="display:inline-block;transition:transform 0.2s;">▶</span>
+        <span style="margin-left:8px;">Server Metadata</span>
+      </div>
+      <div *ngIf="showMetadataPanel" style="margin-top:6px;"><app-metadata></app-metadata></div>
+    </div>
+    <div>
+      <div (click)="showToolsPanel = !showToolsPanel" style="cursor:pointer; display:flex; align-items:center; background:#b3b0b0; border-radius:8px; padding:8px 14px; font-size:17px; font-weight:600; color:#520606;">
+        <span [style.transform]="showToolsPanel ? 'rotate(90deg)' : 'rotate(0deg)'" style="display:inline-block;transition:transform 0.2s;">▶</span>
+        <span style="margin-left:8px;">Tools</span>
+      </div>
+      <div *ngIf="showToolsPanel" style="margin-top:6px;"><app-tool-list></app-tool-list></div>
+    </div>
+  </div>
 </main>
-
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-
-<router-outlet />
