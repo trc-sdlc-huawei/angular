@@ -44,7 +44,7 @@ export class ChatbotUiStreamingComponent {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          llm_choice: 'openai',
+          llm_choice: 'raw',
           query,
           tool_choice: 'auto',
           parallel_tool_calls: true

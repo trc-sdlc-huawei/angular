@@ -51,14 +51,10 @@ export class ChatbotComponent {
   }
 
   fetchAvailableFunctions() {
-    // Fetch both openai-tools and raw-tools, then merge their names
-    Promise.all([
-      this.http.get<any[]>('http://localhost:8000/openai-tools').toPromise().catch(() => []),
-      this.http.get<any[]>('http://localhost:8000/raw-tools').toPromise().catch(() => [])
-    ]).then(([openaiTools, rawTools]) => {
-      const openaiNames = Array.isArray(openaiTools) ? openaiTools.map(t => t.name).filter(Boolean) : [];
+    // Only fetch raw-tools for availableFunctions
+    this.http.get<any[]>('http://localhost:8000/raw-tools').toPromise().then((rawTools) => {
       const rawNames = Array.isArray(rawTools) ? rawTools.map(t => t.name).filter(Boolean) : [];
-      this.availableFunctions = [...new Set([...openaiNames, ...rawNames])];
+      this.availableFunctions = rawNames;
     }).catch(() => {
       this.availableFunctions = [];
     });
@@ -90,7 +86,7 @@ export class ChatbotComponent {
     }
 
     this.http.post<any>('http://localhost:8000/query', {
-      llm_choice: 'openai',
+      llm_choice: 'raw',
       query: input,
       tool_choice,
       parallel_tool_calls: this.parallelToolCalls

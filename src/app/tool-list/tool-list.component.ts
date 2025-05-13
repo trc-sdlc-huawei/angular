@@ -22,16 +22,13 @@ interface ServerToolsDict {
   styleUrl: './tool-list.component.scss'
 })
 export class ToolListComponent {
-  openaiTools: ServerToolsDict = {};
   rawTools: ServerToolsDict = {};
   rawToolsFull: { [server: string]: any } = {};
-  openaiServerNames: string[] = [];
   rawServerNames: string[] = [];
   expandedServers: { [key: string]: boolean } = {};
   loading = false;
   error: string | null = null;
   // UI state for collapsible panels
-  showOpenAITools = false;
   showRawTools = false;
 
   constructor(private http: HttpClient) {
@@ -41,22 +38,7 @@ export class ToolListComponent {
   getAllTools() {
     this.loading = true;
     this.error = null;
-    let openaiDone = false;
     let rawDone = false;
-    this.http.get<ServerToolsDict>('http://localhost:8000/openai-tools').subscribe({
-      next: (tools) => {
-        this.openaiTools = tools;
-        this.openaiServerNames = Object.keys(tools);
-        this.openaiServerNames.forEach(server => this.expandedServers['openai-' + server] = false);
-        openaiDone = true;
-        if (rawDone) this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load OpenAI tools.';
-        openaiDone = true;
-        if (rawDone) this.loading = false;
-      }
-    });
     this.http.get<any>('http://localhost:8000/raw-tools').subscribe({
       next: (toolsRaw) => {
         // Store the full server object for each server
@@ -75,12 +57,12 @@ export class ToolListComponent {
         this.rawServerNames = Object.keys(normalized);
         this.rawServerNames.forEach(server => this.expandedServers['raw-' + server] = false);
         rawDone = true;
-        if (openaiDone) this.loading = false;
+        this.loading = false;
       },
       error: (err) => {
         this.error = 'Failed to load raw tools.';
         rawDone = true;
-        if (openaiDone) this.loading = false;
+        this.loading = false;
       }
     });
   }
@@ -93,26 +75,17 @@ export class ToolListComponent {
     this.expandedServers[prefix + '-' + server] = !this.expandedServers[prefix + '-' + server];
   }
 
-  toggleOpenAITools() {
-    this.showOpenAITools = !this.showOpenAITools;
-  }
-
+  // OpenAI tools toggling removed
   toggleRawTools() {
     this.showRawTools = !this.showRawTools;
   }
 
-  get totalOpenAIServers(): number {
-    return this.openaiServerNames.length;
-  }
-
+  // OpenAI server count removed
   get totalRawServers(): number {
     return this.rawServerNames.length;
   }
 
-  get totalOpenAITools(): number {
-    return this.openaiServerNames.reduce((sum, server) => sum + (this.openaiTools[server]?.length || 0), 0);
-  }
-
+  // OpenAI tools count removed
   get totalRawTools(): number {
     return this.rawServerNames.reduce((sum, server) => sum + (this.rawTools[server]?.length || 0), 0);
   }
